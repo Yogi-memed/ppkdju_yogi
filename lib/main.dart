@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/tugas_layout.dart';
+import 'package:ogi_ppkd_app_dev/latihan_widget/tugas1_flutter.dart';
+
+
 
 void main() {
   runApp(const MyApp());

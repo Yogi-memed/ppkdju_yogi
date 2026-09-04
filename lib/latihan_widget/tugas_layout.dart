@@ -37,7 +37,7 @@ class TugasLyout extends StatelessWidget {
             padding: const EdgeInsets.only(right: 16),
             child: CircleAvatar(
               radius: 20,
-              backgroundImage: AssetImage('assets/profile/qingxiao.jpg'),
+              backgroundImage: AssetImage('assets/image/a.jpg'),
               backgroundColor: Colors.black,
             ),
           ),
@@ -47,7 +47,8 @@ class TugasLyout extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // BIG TITLE HERE !
               Wrap(
@@ -145,9 +146,39 @@ class TugasLyout extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            children: const [
-                              Text("4.8/5 🌏", textAlign: TextAlign.center),
-                              Text(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: Colors.amber,
+                                  ),
+                                  Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: Colors.amber,
+                                  ),
+                                  Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: Colors.amber,
+                                  ),
+                                  Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: Colors.amber,
+                                  ),
+                                  Icon(
+                                    Icons.star_half,
+                                    size: 16,
+                                    color: Colors.amber,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
                                 "Book Sold per Month",
                                 textAlign: TextAlign.center,
                               ),
@@ -176,7 +207,6 @@ class TugasLyout extends StatelessWidget {
               SizedBox(height: 20),
 
               Container(
-                height: double.infinity,
                 padding: const EdgeInsets.all(8),
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -186,7 +216,7 @@ class TugasLyout extends StatelessWidget {
                 ),
                 child: Center(
                   child: Image.asset(
-                    'assets/profile/bg.png',
+                    'assets/image/a.jpg',
                     width: 200,
                     height: 200,
                   ),
