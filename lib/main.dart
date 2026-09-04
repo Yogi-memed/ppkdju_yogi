@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/latihan_screen.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/tugas_s.dart';
+import 'package:ogi_ppkd_app_dev/latihan_widget/tugas_layout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const LatihanScreen(),
+      home: const TugasLyout(),
     );
   }
 }
