@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/tugas1_flutter.dart';
+import 'package:ogi_ppkd_app_dev/latihan_widget/contoh3_flutter.dart';
+import 'package:ogi_ppkd_app_dev/latihan_widget/tugas3_flutter.dart';
+
 
 
 
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const TugasLyout(),
+      home: const Tugas3Flutter(),
     );
   }
 }
