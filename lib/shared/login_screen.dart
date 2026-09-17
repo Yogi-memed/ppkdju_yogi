@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ogi_ppkd_app_dev/db/database/db_helper.dart';
+import 'package:ogi_ppkd_app_dev/db/models/user_login.dart';
 import 'package:ogi_ppkd_app_dev/navigator/navigator.dart';
 import 'package:ogi_ppkd_app_dev/shared/preferencens_handler.dart';
 
@@ -10,9 +12,65 @@ class LoginScreenDay15 extends StatefulWidget {
 }
 
 class _LoginScreenDay15State extends State<LoginScreenDay15> {
-  final _formKey = GlobalKey<FormState>();
+  //final _formKey = GlobalKey<FormState>();
+  //final emailController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final userController = TextEditingController();
+  final passController = TextEditingController();
 
-  final emailController = TextEditingController();
+  void login() async {
+    final user = userController.text.trim();
+    final pass = passController.text;
+
+    if (user.isEmpty || pass.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Isi semua field!')));
+      return;
+    }
+
+    final pengguna = await DBHelper().loginUser(user, pass);
+
+    if (!mounted) return; // Menghindari linter warning penggunaan BuildContext
+
+    if (pengguna != null) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreenDay15()),
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login gagal! email atau Password salah.'),
+        ),
+      );
+    }
+  }
+
+  void register() async {
+    final user = userController.text.trim();
+    final pass = passController.text;
+
+    if (user.isEmpty || pass.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Isi semua field!')));
+      return;
+    }
+
+    final pengguna = UserModelSQL(email: user, password: pass);
+
+    bool success = await DBHelper().registerUser(pengguna);
+
+    if (!mounted) return; // Menghindari linter warning: 'Don't use BuildContext across async gaps'
+
+    if (success) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Akun berhasil dibuat')));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Email sudah terdaftar!')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +119,7 @@ class _LoginScreenDay15State extends State<LoginScreenDay15> {
                     // EMAIL
                     // =========================
                     TextFormField(
-                      controller: emailController,
+                      controller: userController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Email wajib diisi';
@@ -86,6 +144,7 @@ class _LoginScreenDay15State extends State<LoginScreenDay15> {
                     // PASSWORD
                     // =========================
                     TextFormField(
+                      controller: passController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Password',
@@ -99,62 +158,80 @@ class _LoginScreenDay15State extends State<LoginScreenDay15> {
 
                     const SizedBox(height: 24),
 
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          login();
+                        }
+                      },
+                      child: Text('LOGIN'),
+                    ),
+
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          register();
+                        }
+                      },
+                      child: Text('REGISTER'),
+                    ),
+
                     // =========================
                     // BUTTON
                     // =========================
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          // textStyle: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            showDialog(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                title: Text('Data '),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Email: ${emailController.text}'),
-                                  ],
-                                ), // Column
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      context.pop();
-                                      PreferenceHandler.setLogin(true);
-                                      context.push(
-                                        HalamanTerimaKasih(
-                                          email: emailController.text,
-                                        ),
-                                      );
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //     builder: (context) =>
-                                      //         HalamanTerimaKasih(
-                                      //           email: emailController.text,
-                                      //         ),
-                                      //   ), // MaterialPageRoute
-                                      // );
-                                    },
-                                    child: Text('Lanjutkan'),
-                                  ), // TextButtontton
-                                ],
-                              ), // AlertDialog
-                            );
-                          }
-                        },
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
+                    // SizedBox(
+                    //   width: double.infinity,
+                    //   child: ElevatedButton(
+                    //     style: ElevatedButton.styleFrom(
+                    //       backgroundColor: Colors.red,
+                    //       // textStyle: TextStyle(color: Colors.white),
+                    //     ),
+                    //     onPressed: () {
+                    //       if (_formKey.currentState!.validate()) {
+                    //         showDialog(
+                    //           context: context,
+                    //           builder: (_) => AlertDialog(
+                    //             title: Text('Data '),
+                    //             content: Column(
+                    //               mainAxisSize: MainAxisSize.min,
+                    //               crossAxisAlignment: CrossAxisAlignment.start,
+                    //               children: [
+                    //                 Text('Email: ${userController.text}'),
+                    //               ],
+                    //             ), // Column
+                    //             actions: [
+                    //               TextButton(
+                    //                 onPressed: () {
+                    //                   context.pop();
+                    //                   PreferenceHandler.setLogin(true);
+                    //                   context.push(
+                    //                     HalamanTerimaKasih(
+                    //                       email: userController.text,
+                    //                     ),
+                    //                   );
+                    //                   // Navigator.push(
+                    //                   //   context,
+                    //                   //   MaterialPageRoute(
+                    //                   //     builder: (context) =>
+                    //                   //         HalamanTerimaKasih(
+                    //                   //           email: emailController.text,
+                    //                   //         ),
+                    //                   //   ), // MaterialPageRoute
+                    //                   // );
+                    //                 },
+                    //                 child: Text('Lanjutkan'),
+                    //               ), // TextButtontton
+                    //             ],
+                    //           ), // AlertDialog
+                    //         );
+                    //       }
+                    //     },
+                    //     child: const Text(
+                    //       'Login',
+                    //       style: TextStyle(color: Colors.white),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -174,12 +251,30 @@ class HalamanTerimaKasih extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Konfirmasi')),
-      body: Center(
-        child: Text(
-          'Terima kasih, $email',
-          style: TextStyle(fontSize: 18),
-          textAlign: TextAlign.center,
-        ), // Text
+      body: Column(
+        children: [
+          Center(
+            child: Text(
+              'Terima kasih, $email',
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ), // Text
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                PreferenceHandler.logOut();
+                context.pushAndRemoveAll(LoginScreenDay15());
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                // textStyle: TextStyle(color: Colors.white),
+              ),
+              child: Text("Logout"),
+            ),
+          ),
+        ],
       ), // Center
     ); // Scaffold
   }
