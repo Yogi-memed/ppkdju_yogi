@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:ogi_ppkd_app_dev/db/database/db_helper.dart';
-import 'package:ogi_ppkd_app_dev/db/models/user_login.dart';
+import 'package:ogi_ppkd_app_dev/db/services/db_helper.dart';
+import 'package:ogi_ppkd_app_dev/db/models/user_models_sql.dart';
 import 'package:ogi_ppkd_app_dev/navigator/navigator.dart';
-import 'package:ogi_ppkd_app_dev/shared/preferencens_handler.dart';
+import 'package:ogi_ppkd_app_dev/db/services/preferencens_handler.dart';
+import 'package:ogi_ppkd_app_dev/views/tugas_12_13/screens/home_screen.dart';
 
 class LoginScreenDay15 extends StatefulWidget {
   const LoginScreenDay15({super.key});
@@ -18,6 +19,44 @@ class _LoginScreenDay15State extends State<LoginScreenDay15> {
   final userController = TextEditingController();
   final passController = TextEditingController();
 
+  // void login() async {
+  //   final user = userController.text.trim();
+  //   final pass = passController.text;
+
+  //   if (user.isEmpty || pass.isEmpty) {
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(const SnackBar(content: Text('Isi semua field!')));
+  //     return;
+  //   }
+
+  //   final pengguna = await DBHelper().loginUser(user, pass);
+
+  //   if (!mounted) return; // Menghindari linter warning penggunaan BuildContext
+
+  //   if (pengguna != null) {
+  //     await PreferenceHandler.setLogin(true);
+
+  //     if (!context.mounted) return;
+
+  //     Navigator.of(context).pushAndRemoveUntil(
+  //       MaterialPageRoute(builder: (_) => const HomeScreen()),
+  //       (route) => false,
+  //     );
+  //   }
+  //   // if (pengguna != null) {
+  //   //   Navigator.of(context).pushAndRemoveUntil(
+  //   //     MaterialPageRoute(builder: (_) => const LoginScreenDay15()),
+  //   //     (route) => false,
+  //   //   );
+  //   // } else {
+  //   //   ScaffoldMessenger.of(context).showSnackBar(
+  //   //     const SnackBar(
+  //   //       content: Text('Login gagal! email atau Password salah.'),
+  //   //     ),
+  //   //   );
+  //   // }
+  // }
+
   void login() async {
     final user = userController.text.trim();
     final pass = passController.text;
@@ -25,22 +64,27 @@ class _LoginScreenDay15State extends State<LoginScreenDay15> {
     if (user.isEmpty || pass.isEmpty) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Isi semua field!')));
+
       return;
     }
 
     final pengguna = await DBHelper().loginUser(user, pass);
 
-    if (!mounted) return; // Menghindari linter warning penggunaan BuildContext
+    if (!mounted) return;
 
     if (pengguna != null) {
+      await PreferenceHandler.setLogin(true);
+
+      if (!mounted) return;
+
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreenDay15()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
         (route) => false,
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Login gagal! email atau Password salah.'),
+          content: Text('Login gagal! Email atau password salah.'),
         ),
       );
     }

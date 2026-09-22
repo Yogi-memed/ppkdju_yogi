@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/latihan/contoh3_flutter.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/latihan_bottom_navigator.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/latihan_drawer.dart';
-import 'package:ogi_ppkd_app_dev/shared/login_screen.dart';
-import 'package:ogi_ppkd_app_dev/shared/preferencens_handler.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/Tugas/tugas3_flutter.dart';
-import 'package:ogi_ppkd_app_dev/shared/splash_screen.dart';
+import 'package:ogi_ppkd_app_dev/db/services/preferencens_handler.dart';
+import 'package:ogi_ppkd_app_dev/tugas/tugas_5/tugas_5.dart';
+import 'package:ogi_ppkd_app_dev/views/tugas_11/login_screen.dart';
+import 'package:ogi_ppkd_app_dev/views/tugas_11/profile_screen.dart';
+import 'package:ogi_ppkd_app_dev/views/tugas_11/splash_screen.dart';
+import 'package:ogi_ppkd_app_dev/views/tugas_12_13/screens/home_screen.dart';
+import 'package:ogi_ppkd_app_dev/views/tugas_12_13/services/database_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const LoginScreenDay15(),
+      home: const HomeScreen(),
     );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:ogi_ppkd_app_dev/db/models/user_login.dart';
+import 'package:ogi_ppkd_app_dev/db/models/user_models_sql.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 

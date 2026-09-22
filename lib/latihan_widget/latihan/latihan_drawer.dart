@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ogi_ppkd_app_dev/latihan_widget/latihan_avatar.dart';
 import 'package:ogi_ppkd_app_dev/latihan_widget/latihan_bottom_navigator.dart';
-import 'package:ogi_ppkd_app_dev/latihan_widget/Tugas/tugas3_flutter.dart';
+import 'package:ogi_ppkd_app_dev/tugas/tugas_5/tugas_5.dart';
 
 class LatihanDrawer extends StatefulWidget {
   const LatihanDrawer({Key? key}) : super(key: key);
