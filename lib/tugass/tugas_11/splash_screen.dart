@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'package:ogi_ppkd_app_dev/views/tugas_11/login_screen.dart';
-import 'package:ogi_ppkd_app_dev/views/tugas_12_13/screens/home_screen.dart';
+import 'package:ogi_ppkd_app_dev/tugass/tugas_11/login_screen.dart';
+import 'package:ogi_ppkd_app_dev/tugass/tugas_12_13/screens/home_screen.dart';
 import 'package:ogi_ppkd_app_dev/db/services/preferencens_handler.dart';
 import 'package:ogi_ppkd_app_dev/navigator/navigator.dart';
 

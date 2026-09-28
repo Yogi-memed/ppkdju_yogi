@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
-import 'package:ogi_ppkd_app_dev/day_19/views/post_list_views.dart';
-import 'package:ogi_ppkd_app_dev/db/services/preferencens_handler.dart';
-import 'package:ogi_ppkd_app_dev/views/tugas%2014/views/character_list_view.dart';
-import 'package:ogi_ppkd_app_dev/views/tugas%2014/views/reusable/app_theme.dart';
+import 'package:ogi_ppkd_app_dev/project_absensi/reusable/theme_controller.dart';
+import 'package:ogi_ppkd_app_dev/project_absensi/services/storage_services.dart';
+import 'package:ogi_ppkd_app_dev/project_absensi/views/auth/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await PreferenceHandler.init();
+  final savedTheme = await StorageServices.getTheme();
+
+  ThemeController.isDarkMode.value = savedTheme;
 
   runApp(const MyApp());
 }
@@ -18,15 +19,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Rick & Morty App',
+    return ValueListenableBuilder<bool>(
+      valueListenable: ThemeController.isDarkMode,
+      builder: (context, isDarkMode, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Absensi PPKD',
 
-      // Menggunakan tema yang sudah dibuat
-      theme: AppTheme.themeData(),
+          theme: ThemeData(
+            brightness: Brightness.light,
+            colorSchemeSeed: Colors.blue,
+            useMaterial3: true,
+          ),
 
-      // Halaman utama aplikasi
-      home: const CharacterListView(),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            colorSchemeSeed: Colors.blue,
+            useMaterial3: true,
+          ),
+
+          themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+
+          home: const LoginScreen(),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ogi_ppkd_app_dev/views/tugas%2014/views/reusable/app_theme.dart';
+import 'package:ogi_ppkd_app_dev/tugass/tugas%2014/views/reusable/app_theme.dart';
 
 import '../models/character_model.dart';
 import '../reusable/app_theme.dart';

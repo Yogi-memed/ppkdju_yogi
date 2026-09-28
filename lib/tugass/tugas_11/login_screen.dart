@@ -3,7 +3,7 @@ import 'package:ogi_ppkd_app_dev/db/services/db_helper.dart';
 import 'package:ogi_ppkd_app_dev/db/models/user_models_sql.dart';
 import 'package:ogi_ppkd_app_dev/navigator/navigator.dart';
 import 'package:ogi_ppkd_app_dev/db/services/preferencens_handler.dart';
-import 'package:ogi_ppkd_app_dev/views/tugas_12_13/screens/home_screen.dart';
+import 'package:ogi_ppkd_app_dev/tugass/tugas_12_13/screens/home_screen.dart';
 
 class LoginScreenDay15 extends StatefulWidget {
   const LoginScreenDay15({super.key});

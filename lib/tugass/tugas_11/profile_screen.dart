@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ogi_ppkd_app_dev/db/services/preferencens_handler.dart';
-import 'package:ogi_ppkd_app_dev/views/tugas_11/splash_screen.dart';
+import 'package:ogi_ppkd_app_dev/tugass/tugas_11/splash_screen.dart';
 import 'package:shared_preferences_windows/shared_preferences_windows.dart';
 
 class TugasSessionProfileScreen extends StatefulWidget {
