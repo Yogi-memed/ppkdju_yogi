@@ -480,11 +480,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2563EB), Color(0xFF4F46E5)],
+          colors: [
+            Color.fromARGB(255, 54, 63, 82),
+            Color.fromARGB(255, 27, 25, 68),
+          ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withValues(alpha: 0.20),
+            color: const Color.fromARGB(
+              255,
+              53,
+              64,
+              73,
+            ).withValues(alpha: 0.20),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),
