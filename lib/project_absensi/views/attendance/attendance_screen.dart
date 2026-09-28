@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../services/api_services.dart';
@@ -19,58 +18,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   bool isLoading = false;
   bool isCheckInLoading = false;
   bool isCheckOutLoading = false;
-
-  // Menandakan apakah hari ini sudah Check Out
-  bool hasCheckedOut = false;
+  bool isIzinLoading = false;
 
   String locationMessage = 'Lokasi belum diambil';
 
   @override
   void initState() {
     super.initState();
-    checkTodayAttendance();
-  }
 
-  Future<void> checkTodayAttendance() async {
-    try {
-      final token = await StorageServices.getToken();
-
-      if (token == null || token.isEmpty) {
-        return;
-      }
-
-      final now = DateTime.now();
-
-      final year = now.year.toString();
-      final month = now.month.toString().padLeft(2, '0');
-      final day = now.day.toString().padLeft(2, '0');
-
-      final today = '$year-$month-$day';
-
-      final response = await ApiServices().getHistory(
-        token: token,
-        start: today,
-        end: today,
-      );
-
-      if (response.statusCode == 200) {
-        final List data = response.data['data'] ?? [];
-
-        if (data.isNotEmpty) {
-          final todayAttendance = data.first;
-
-          if (todayAttendance['check_out'] != null) {
-            if (mounted) {
-              setState(() {
-                hasCheckedOut = true;
-              });
-            }
-          }
-        }
-      }
-    } catch (error) {
-      // Tidak perlu menampilkan error saat pengecekan awal.
-    }
+    getCurrentLocation();
   }
 
   Future<void> getCurrentLocation() async {
@@ -87,6 +43,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           locationMessage = 'GPS belum aktif';
           isLoading = false;
         });
+
         return;
       }
 
@@ -101,6 +58,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           locationMessage = 'Izin lokasi ditolak';
           isLoading = false;
         });
+
         return;
       }
 
@@ -110,10 +68,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               'Izin lokasi ditolak permanen. Aktifkan melalui pengaturan.';
           isLoading = false;
         });
+
         return;
       }
 
       final position = await Geolocator.getCurrentPosition();
+
+      if (!mounted) return;
 
       setState(() {
         currentPosition = position;
@@ -125,6 +86,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         isLoading = false;
       });
     } catch (error) {
+      if (!mounted) return;
+
       setState(() {
         locationMessage = 'Gagal mengambil lokasi: $error';
         isLoading = false;
@@ -137,6 +100,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ambil lokasi GPS terlebih dahulu')),
       );
+
       return;
     }
 
@@ -152,10 +116,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           const SnackBar(content: Text('Token login tidak ditemukan')),
         );
 
-        setState(() {
-          isCheckInLoading = false;
-        });
-
         return;
       }
 
@@ -167,19 +127,25 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       );
 
       if (response.statusCode == 200) {
+        if (!mounted) return;
+
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Check In berhasil')));
       }
     } catch (error) {
+      if (!mounted) return;
+
       String message = 'Check In gagal';
 
-      if (error is DioException && error.response?.statusCode == 409) {
+      if (error.toString().contains('409')) {
         message = 'Anda sudah melakukan absensi hari ini';
       }
 
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(message)));
     } finally {
+      if (!mounted) return;
+
       setState(() {
         isCheckInLoading = false;
       });
@@ -187,20 +153,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> checkOut() async {
-    // Cegah Check Out kedua kali
-    if (hasCheckedOut) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Anda sudah melakukan Check Out hari ini'),
-        ),
-      );
-      return;
-    }
-
     if (currentPosition == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ambil lokasi GPS terlebih dahulu')),
       );
+
       return;
     }
 
@@ -216,10 +173,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           const SnackBar(content: Text('Token login tidak ditemukan')),
         );
 
-        setState(() {
-          isCheckOutLoading = false;
-        });
-
         return;
       }
 
@@ -231,31 +184,111 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          hasCheckedOut = true;
-        });
+        if (!mounted) return;
 
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Check Out berhasil')));
       }
     } catch (error) {
-      if (error is DioException && error.response?.statusCode == 409) {
-        setState(() {
-          hasCheckedOut = true;
-        });
+      if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Anda sudah melakukan Check Out hari ini'),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Check Out gagal: $error')));
-      }
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Check Out gagal: $error')));
     } finally {
+      if (!mounted) return;
+
       setState(() {
         isCheckOutLoading = false;
+      });
+    }
+  }
+
+  Future<void> izinSakit() async {
+    if (currentPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ambil lokasi GPS terlebih dahulu')),
+      );
+
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Izin Sakit'),
+          content: const Text(
+            'Yakin ingin mengajukan izin sakit untuk hari ini?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              child: const Text('Ajukan Izin'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true) {
+      return;
+    }
+
+    setState(() {
+      isIzinLoading = true;
+    });
+
+    try {
+      final token = await StorageServices.getToken();
+
+      if (token == null || token.isEmpty) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Token login tidak ditemukan')),
+        );
+
+        return;
+      }
+
+      final response = await ApiServices().izinSakit(
+        token: token,
+        latitude: currentPosition!.latitude,
+        longitude: currentPosition!.longitude,
+        address: locationMessage,
+      );
+
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Izin sakit berhasil diajukan')),
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+
+      String message = 'Gagal mengajukan izin sakit';
+
+      if (error.toString().contains('409')) {
+        message = 'Anda sudah melakukan absensi atau izin hari ini';
+      }
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (!mounted) return;
+
+      setState(() {
+        isIzinLoading = false;
       });
     }
   }
@@ -264,6 +297,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF9E9E9E),
+
       appBar: AppBar(
         backgroundColor: const Color(0xFF757575),
         foregroundColor: Colors.white,
@@ -273,6 +307,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         ),
         centerTitle: true,
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -289,6 +324,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
             const SizedBox(height: 20),
 
+            // =========================
+            // LOKASI
+            // =========================
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -297,13 +335,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
                     Icons.location_on,
                     color: Colors.redAccent,
                     size: 30,
                   ),
+
                   const SizedBox(width: 12),
+
                   Expanded(
                     child: Text(
                       locationMessage,
@@ -316,7 +357,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
             const SizedBox(height: 16),
 
-            // AMBIL LOKASI GPS
+            // =========================
+            // AMBIL LOKASI
+            // =========================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -335,7 +378,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
             const SizedBox(height: 16),
 
+            // =========================
             // GOOGLE MAPS
+            // =========================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -362,7 +407,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
             const SizedBox(height: 16),
 
+            // =========================
             // CHECK IN
+            // =========================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -391,15 +438,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
+            // =========================
             // CHECK OUT
+            // =========================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: (isCheckOutLoading || hasCheckedOut)
-                    ? null
-                    : checkOut,
+                onPressed: isCheckOutLoading ? null : checkOut,
                 icon: isCheckOutLoading
                     ? const SizedBox(
                         width: 20,
@@ -411,11 +458,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       )
                     : const Icon(Icons.logout),
                 label: Text(
-                  isCheckOutLoading
-                      ? 'Memproses Check Out...'
-                      : hasCheckedOut
-                      ? 'Sudah Check Out'
-                      : 'Check Out',
+                  isCheckOutLoading ? 'Memproses Check Out...' : 'Check Out',
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
@@ -428,8 +471,41 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               ),
             ),
 
+            const SizedBox(height: 12),
+
+            // =========================
+            // IZIN SAKIT
+            // =========================
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: isIzinLoading ? null : izinSakit,
+                icon: isIzinLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.sick),
+                label: Text(
+                  isIzinLoading ? 'Mengajukan Izin...' : 'Izin Sakit',
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+
             const SizedBox(height: 16),
 
+            // =========================
+            // STATUS GPS
+            // =========================
             if (currentPosition != null)
               Container(
                 width: double.infinity,
@@ -438,12 +514,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   color: const Color(0xFF616161),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text(
-                  'Lokasi berhasil ditemukan!',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.greenAccent),
+                    SizedBox(width: 10),
+                    Text(
+                      'Lokasi berhasil ditemukan!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],

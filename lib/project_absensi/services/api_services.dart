@@ -120,4 +120,25 @@ class ApiServices {
 
     return response;
   }
+
+  Future<Response> izinSakit({
+    required String token,
+    required double latitude,
+    required double longitude,
+    required String address,
+  }) async {
+    final response = await dio.post(
+      '/api/absen/check-in',
+      data: {
+        'check_in_lat': latitude.toString(),
+        'check_in_lng': longitude.toString(),
+        'check_in_address': address,
+        'status': 'izin',
+        'alasan_izin': 'izin sakit',
+      },
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+
+    return response;
+  }
 }

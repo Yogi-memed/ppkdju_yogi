@@ -201,8 +201,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 55)),
-
+            ClipOval(
+              child: Image.asset(
+                'assets/image/a.jpg',
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+            ),
             const SizedBox(height: 20),
 
             Text(
