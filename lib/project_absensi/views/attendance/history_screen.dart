@@ -466,7 +466,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> _showDeleteDialog(AttendanceModel item) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -482,13 +482,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context, false);
+                Navigator.pop(dialogContext, false);
               },
               child: const Text('Batal'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context, true);
+                Navigator.pop(dialogContext, true);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
@@ -501,23 +501,102 @@ class _HistoryScreenState extends State<HistoryScreen> {
       },
     );
 
-    if (result == true) {
-      // Untuk sementara tombol tetap mempertahankan
-      // UI hapus yang sudah ada.
-      //
-      // Endpoint DELETE attendance belum kita ubah
-      // di sini supaya tidak mengganggu API history
-      // yang sekarang sudah berhasil.
+    if (result != true) {
+      return;
+    }
+
+    try {
+      final token = await StorageServices.getToken();
+
+      if (token == null || token.isEmpty) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Token login tidak ditemukan')),
+        );
+
+        return;
+      }
+
+      final response = await ApiServices().deleteAttendance(
+        token: token,
+        id: item.id,
+      );
+
+      if (response.statusCode == 200) {
+        if (!mounted) return;
+
+        setState(() {
+          history.removeWhere((attendance) => attendance.id == item.id);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Data absensi berhasil dihapus')),
+        );
+      }
+    } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Fitur hapus siap dihubungkan ke API DELETE.'),
-        ),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal menghapus absensi: $e')));
     }
   }
 }
+//   Future<void> _showDeleteDialog(AttendanceModel item) async {
+//     final result = await showDialog<bool>(
+//       context: context,
+//       builder: (context) {
+//         return AlertDialog(
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(20),
+//           ),
+//           title: const Text(
+//             'Hapus Riwayat?',
+//             style: TextStyle(fontWeight: FontWeight.w800),
+//           ),
+//           content: const Text(
+//             'Apakah kamu yakin ingin menghapus '
+//             'riwayat absensi ini?',
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.pop(context, false);
+//               },
+//               child: const Text('Batal'),
+//             ),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.pop(context, true);
+//               },
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: Colors.redAccent,
+//                 foregroundColor: Colors.white,
+//               ),
+//               child: const Text('Hapus'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+
+//     if (result == true) {
+//       // Untuk sementara tombol tetap mempertahankan
+//       // UI hapus yang sudah ada.
+//       //
+//       // Endpoint DELETE attendance belum kita ubah
+//       // di sini supaya tidak mengganggu API history
+//       // yang sekarang sudah berhasil.
+//       if (!mounted) return;
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Fitur hapus siap dihubungkan ke API DELETE.'),
+//         ),
+//       );
+//     }
+//   }
+// }
 // import 'package:flutter/material.dart';
 
 // import '../../models/attendance_model.dart';
