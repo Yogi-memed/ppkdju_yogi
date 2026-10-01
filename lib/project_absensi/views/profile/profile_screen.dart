@@ -380,7 +380,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
+            style: const TextStyle(
+              color: Color.fromARGB(179, 65, 58, 58),
+              fontSize: 13,
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -495,7 +498,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.10),
+              color: const Color.fromARGB(
+                255,
+                38,
+                41,
+                43,
+              ).withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(13),
             ),
             child: Icon(icon, color: Colors.blue, size: 20),
