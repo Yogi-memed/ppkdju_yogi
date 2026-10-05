@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../models/attendance_model.dart';
 import '../../services/api_services.dart';
 import '../../services/storage_services.dart';
+
 import '../attendance/attendance_screen.dart';
 import '../attendance/history_screen.dart';
 import '../profile/profile_screen.dart';
@@ -37,6 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isLocationLoading = false;
 
   List<AttendanceModel> attendanceList = [];
+
   AttendanceModel? todayAttendance;
 
   String locationAddress = 'Mencari lokasi...';
@@ -45,10 +47,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   GoogleMapController? mapController;
 
-  // Default hanya sebagai titik awal map.
-  // Kalau GPS sudah berhasil, map akan otomatis pindah
-  // ke lokasi GPS perangkat.
   final LatLng defaultLocation = const LatLng(-6.2000, 106.816666);
+
+  // =========================
+  // INIT
+  // =========================
 
   @override
   void initState() {
@@ -177,6 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             isLocationLoading = false;
           });
         }
+
         return;
       }
 
@@ -194,6 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             isLocationLoading = false;
           });
         }
+
         return;
       }
 
@@ -204,6 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             isLocationLoading = false;
           });
         }
+
         return;
       }
 
@@ -218,15 +224,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       setState(() {
         currentPosition = position;
-
-        // GPS tetap asli,
-        // tetapi label yang ditampilkan adalah PPKD JU.
         locationAddress = 'PPKD JU';
-
         isLocationLoading = false;
       });
 
-      // Pindahkan kamera Google Maps ke GPS terbaru
+      // Pindahkan kamera
       if (mapController != null) {
         await mapController!.animateCamera(
           CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
@@ -301,6 +303,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         '${date.month.toString().padLeft(2, '0')}/'
         '${date.year}';
   }
+
+  // =========================
+  // FORMAT JAM
+  // =========================
 
   String formatTime(String? value) {
     if (value == null || value.isEmpty) {
@@ -383,17 +389,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // HEADER
                 _buildHeader(),
 
                 const SizedBox(height: 22),
 
-                // WELCOME
                 _buildWelcomeCard(),
 
                 const SizedBox(height: 24),
 
-                // STATISTIK
                 _buildSectionTitle(
                   'Statistik Absensi',
                   'Ringkasan kehadiran kamu',
@@ -405,7 +408,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 const SizedBox(height: 26),
 
-                // ABSENSI HARI INI
                 _buildSectionTitle(
                   'Absensi Hari Ini',
                   'Status kehadiran hari ini',
@@ -417,7 +419,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 const SizedBox(height: 26),
 
-                // LOKASI
                 _buildSectionTitle('Lokasi Saya', 'Lokasi GPS perangkat kamu'),
 
                 const SizedBox(height: 12),
@@ -426,12 +427,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 const SizedBox(height: 14),
 
-                // MAP PREVIEW
                 _buildMapPreview(),
 
                 const SizedBox(height: 26),
 
-                // RIWAYAT
                 _buildSectionTitle('Riwayat Kehadiran', 'Absensi terbaru kamu'),
 
                 const SizedBox(height: 8),
@@ -459,6 +458,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
 
+      // =========================
+      // BOTTOM NAVIGATION
+      // =========================
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
@@ -543,7 +545,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   fontSize: 12,
                 ),
               ),
+
               const SizedBox(height: 3),
+
               Text(
                 userName,
                 maxLines: 1,
@@ -808,6 +812,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildTodayAttendance() {
     final isHadir = todayStatus == 'Hadir';
+
     final isIzin = todayStatus == 'Izin Sakit';
 
     return Container(
@@ -859,7 +864,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     fontSize: 14,
                   ),
                 ),
+
                 const SizedBox(height: 4),
+
                 Text(
                   todayAttendance == null
                       ? 'Kamu belum melakukan absensi.'
@@ -1017,7 +1024,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // =========================
-  // GOOGLE MAP PREVIEW
+  // MAP PREVIEW
   // =========================
 
   Widget _buildMapPreview() {
@@ -1063,7 +1070,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
           ),
 
-          // Label PPKD JU
+          // =========================
+          // LABEL PPKD JU
+          // =========================
           Positioned(
             top: 14,
             left: 14,
@@ -1078,7 +1087,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.location_on_rounded, color: accentLight, size: 17),
+
                   SizedBox(width: 6),
+
                   Text(
                     'PPKD JU',
                     style: TextStyle(
@@ -1092,7 +1103,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
 
-          // Tombol lokasi saya
+          // =========================
+          // TOMBOL LOKASI
+          // =========================
           Positioned(
             right: 14,
             bottom: 14,
@@ -1282,6 +1295,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // =========================
+  // TIME ITEM
+  // =========================
+
   Widget _buildTimeItem({
     required IconData icon,
     required String title,
@@ -1292,7 +1309,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Row(
         children: [
           Icon(icon, size: 17, color: accentLight),
+
           const SizedBox(width: 7),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1303,7 +1322,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   fontSize: 10,
                 ),
               ),
+
               const SizedBox(height: 2),
+
               Text(
                 value,
                 style: const TextStyle(
@@ -1349,7 +1370,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 4),
 
           Text(
-            'Data absensi kamu akan muncul di sini.',
+            'Data absensi kamu akan muncul '
+            'di sini.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.40),
@@ -1403,6 +1425,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           child: Row(
             children: [
+              // HOME
               Expanded(
                 child: _buildNavItem(
                   icon: Icons.home_rounded,
@@ -1412,6 +1435,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
 
+              // KEHADIRAN
               Expanded(
                 child: _buildNavItem(
                   icon: Icons.fingerprint_rounded,
@@ -1421,6 +1445,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
 
+              // RIWAYAT
+              Expanded(
+                child: _buildNavItem(
+                  icon: Icons.history_rounded,
+                  label: 'Riwayat',
+                  active: false,
+                  onTap: openHistory,
+                ),
+              ),
+
+              // PROFILE
               Expanded(
                 child: _buildNavItem(
                   icon: Icons.person_rounded,
@@ -1435,6 +1470,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+  // =========================
+  // NAV ITEM
+  // =========================
 
   Widget _buildNavItem({
     required IconData icon,
